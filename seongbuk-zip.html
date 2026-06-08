@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>성북.zip</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F5F5;
+    --navy: #0D1B2A;
+    --yellow: #F5FF4F;
+    --card-bg: #FFFFFF;
+    --chip-bg: #EFEFEF;
+    --chip-border: #E0E0E0;
+    --text-main: #0D1B2A;
+    --text-sub: #888;
+    --text-light: #aaa;
+    --radius-card: 14px;
+    --radius-chip: 100px;
+    --font: 'Noto Sans KR', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-main);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    display: none;
+    min-height: 100vh;
+    padding-bottom: 100px;
+    position: relative;
+    background: var(--bg);
+    animation: fadeIn 0.18s ease;
+  }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    background: var(--bg);
+    padding: 18px 18px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .logo-text {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .logo-text .zip {
+    color: #C8D400;
+  }
+  .search-bar {
+    width: 100%;
+    background: #E8E8E8;
+    border: none;
+    border-radius: 100px;
+    padding: 11px 16px;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+  }
+  .search-bar::placeholder { color: var(--text-light); }
+
+  /* ─── TABS ─── */
+  .tab-row {
+    display: flex;
+    padding: 0 18px;
+    border-bottom: 1.5px solid #E0E0E0;
+    background: var(--bg);
+    position: sticky;
+    top: 88px;
+    z-index: 99;
+    gap: 0;
+  }
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-sub);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px;
+    transition: all 0.15s;
+  }
+  .tab-item.active {
+    color: var(--navy);
+    font-weight: 700;
+    border-bottom-color: var(--navy);
+  }
+
+  /* ─── FILTER CHIPS ─── */
+  .chip-scroll {
+    display: flex;
+    gap: 7px;
+    padding: 12px 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chip-scroll::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: var(--radius-chip);
+    border: 1.5px solid var(--chip-border);
+    background: var(--card-bg);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .chip.active {
+    background: var(--navy);
+    color: var(--yellow);
+    border-color: var(--navy);
+    font-weight: 700;
+  }
+
+  /* ─── BUSINESS CARD ─── */
+  .card-list { padding: 6px 18px 0; display: flex; flex-direction: column; gap: 12px; }
+  .biz-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    padding: 16px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .biz-card:active { transform: scale(0.985); }
+  .biz-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .biz-name { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .biz-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .biz-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .star-icon { color: #FFD700; font-size: 14px; }
+  .biz-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 8px; }
+  .tag-chip {
+    padding: 4px 10px;
+    border-radius: var(--radius-chip);
+    background: var(--chip-bg);
+    font-size: 12px;
+    color: var(--text-main);
+    font-weight: 500;
+    border: 1px solid var(--chip-border);
+  }
+  .tag-chip.pay-yes {
+    background: var(--yellow);
+    border-color: #D4E000;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .biz-quote {
+    font-size: 13px;
+    color: var(--text-sub);
+    font-style: normal;
+    line-height: 1.5;
+  }
+  .biz-quote::before { content: '"'; }
+  .biz-quote::after { content: '"'; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+    gap: 8px;
+  }
+  .empty-icon { font-size: 36px; }
+  .empty-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .empty-sub { font-size: 13px; color: var(--text-sub); }
+
+  /* ─── FAB ─── */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: var(--yellow);
+    border: none;
+    border-radius: 100px;
+    padding: 14px 24px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(13,27,42,0.3);
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 200;
+  }
+  .fab.collapsed {
+    padding: 14px 18px;
+    border-radius: 50%;
+    width: 54px;
+    height: 54px;
+    justify-content: center;
+  }
+  .fab.collapsed .fab-text { display: none; }
+  .fab-icon { font-size: 18px; }
+
+  /* ─── DETAIL SCREEN ─── */
+  .detail-header {
+    background: var(--navy);
+    color: white;
+    padding: 18px 18px 22px;
+  }
+  .back-btn {
+    color: rgba(255,255,255,0.75);
+    background: none;
+    border: none;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .detail-name { font-size: 24px; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 10px; }
+  .detail-category-badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+
+  .tags-section { padding: 16px 18px 0; }
+  .tags-label { font-size: 12px; color: var(--text-sub); margin-bottom: 8px; font-weight: 500; }
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .review-list { padding: 16px 18px 0; }
+  .review-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .avatar {
+    width: 40px; height: 40px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .review-period { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .review-quote { font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 10px; font-style: normal; }
+  .review-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .review-tag { 
+    padding: 5px 11px;
+    border-radius: var(--radius-chip);
+    background: var(--chip-bg);
+    font-size: 12px;
+    color: var(--text-main);
+    font-weight: 500;
+    border: 1px solid var(--chip-border);
+  }
+  .review-tag.pay-yes {
+    background: var(--yellow);
+    border-color: #D4E000;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .review-tag-toggle {
+    background: none;
+    border: none;
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--text-sub);
+    cursor: pointer;
+    padding: 4px 0 8px;
+    display: block;
+  }
+  .next-message {
+    background: var(--yellow);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 10px;
+  }
+  .next-message-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+    opacity: 0.65;
+  }
+  .next-message-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.4;
+  }
+
+  .write-btn-wrap { padding: 16px 18px; }
+  .write-btn {
+    width: 100%;
+    background: var(--navy);
+    color: var(--yellow);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* ─── FORM SCREENS ─── */
+  .form-header {
+    padding: 16px 18px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #E8E8E8;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .form-back {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--navy);
+    padding: 0;
+    line-height: 1;
+  }
+  .form-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .progress-dots { display: flex; gap: 5px; margin-left: auto; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #D0D0D0; }
+  .dot.active { background: var(--navy); }
+
+  .form-body { padding: 20px 18px; }
+  .form-section { margin-bottom: 28px; }
+  .form-label { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+  .form-sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; font-weight: 400; }
+  .option-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .option-chip {
+    padding: 8px 14px;
+    border-radius: var(--radius-chip);
+    border: 1.5px solid var(--chip-border);
+    background: var(--card-bg);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .option-chip.selected {
+    background: var(--navy);
+    color: var(--yellow);
+    border-color: var(--navy);
+    font-weight: 700;
+  }
+
+  .text-input {
+    width: 100%;
+    background: #E8E8E8;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    margin-bottom: 14px;
+  }
+  .text-input::placeholder { color: var(--text-light); }
+
+  .big-btn {
+    width: 100%;
+    background: var(--navy);
+    color: var(--yellow);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .big-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ─── STAR RATING ─── */
+  .star-row { display: flex; gap: 8px; margin-bottom: 4px; }
+  .star-btn {
+    font-size: 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+    color: #D0D0D0;
+  }
+  .star-btn.lit { color: #FFD700; }
+  .star-btn:active { transform: scale(1.2); }
+
+  .textarea {
+    width: 100%;
+    background: #E8E8E8;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text-main);
+    outline: none;
+    resize: none;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+  .textarea::placeholder { color: var(--text-light); }
+
+  /* ─── PERIOD SELECT ─── */
+  .period-select {
+    flex: 1;
+    background: #E8E8E8;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 8px;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text-main);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    cursor: pointer;
+  }
+  .period-select:focus { background: #DCDCDC; }
+
+  /* ─── SUCCESS TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy);
+    color: var(--yellow);
+    padding: 12px 20px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 1: 메인 리스트                      -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-main" class="screen active">
+  <div class="topbar">
+    <div class="logo-row">
+      <svg width="52" height="63" viewBox="0 0 38 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 7C0 3.13 3.13 0 7 0H26L38 12V39C38 42.87 34.87 46 31 46H7C3.13 46 0 42.87 0 39V7Z" fill="#F5FF4F"/>
+        <path d="M26 0L38 12H29C27.34 12 26 10.66 26 9V0Z" fill="#D4E000"/>
+        <rect x="8" y="10" width="8" height="2" rx="1" fill="#0D1B2A" opacity="0.35"/>
+        <rect x="8" y="15" width="8" height="2" rx="1" fill="#0D1B2A" opacity="0.35"/>
+        <rect x="8" y="20" width="8" height="2" rx="1" fill="#0D1B2A" opacity="0.35"/>
+        <text x="22" y="38" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="11" fill="#0D1B2A">₩</text>
+      </svg>
+      <span class="logo-text">성북<span class="zip">.zip</span></span>
+    </div>
+    <input class="search-bar" type="text" placeholder="사업장 검색" id="search-input" oninput="filterCards()">
+  </div>
+
+  <div class="tab-row" id="main-tabs">
+    <div class="tab-item active" data-region="전체" onclick="selectTab(this)">전체</div>
+    <div class="tab-item" data-region="정릉" onclick="selectTab(this)">정릉</div>
+    <div class="tab-item" data-region="길음" onclick="selectTab(this)">길음</div>
+    <div class="tab-item" data-region="미아" onclick="selectTab(this)">미아</div>
+    <div class="tab-item" data-region="그 외" onclick="selectTab(this)">그 외</div>
+  </div>
+
+  <div class="chip-scroll" id="category-chips">
+    <div class="chip active" data-cat="전체" onclick="selectCat(this)">전체</div>
+    <div class="chip" data-cat="카페·베이커리" onclick="selectCat(this)">카페·베이커리</div>
+    <div class="chip" data-cat="편의점" onclick="selectCat(this)">편의점</div>
+    <div class="chip" data-cat="식당" onclick="selectCat(this)">식당</div>
+    <div class="chip" data-cat="PC방" onclick="selectCat(this)">PC방</div>
+    <div class="chip" data-cat="학원" onclick="selectCat(this)">학원</div>
+    <div class="chip" data-cat="기타" onclick="selectCat(this)">기타</div>
+  </div>
+
+  <div class="card-list" id="card-list"></div>
+  <div class="empty-state" id="empty-state" style="display:none">
+    <div class="empty-icon">📣</div>
+    <div class="empty-title">아직 이 동네 후기가 없어요</div>
+    <div class="empty-sub">첫 번째 후기를 남겨보세요!</div>
+  </div>
+
+  <button class="fab" id="main-fab" onclick="goTo('screen-fab-input')">
+    <span class="fab-icon">📣</span>
+    <span class="fab-text">우리 동네 알바처 제보하기</span>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 2/3: 사업장 상세                    -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-detail" class="screen">
+  <div class="detail-header">
+    <button class="back-btn" id="detail-back-btn" onclick="goTo('screen-main')">← <span id="detail-region"></span></button>
+    <div class="detail-name" id="detail-name"></div>
+    <div id="detail-category" class="detail-category-badge"></div>
+  </div>
+
+  <div style="padding: 14px 18px 0; display:flex; align-items:center; gap:6px;">
+    <span style="font-size:13px; color:var(--text-sub); font-weight:500;" id="detail-review-count"></span>
+  </div>
+
+  <div class="tags-section">
+    <div class="tags-wrap" id="detail-all-tags"></div>
+  </div>
+
+  <div class="review-list" id="detail-reviews"></div>
+
+  <div class="write-btn-wrap">
+    <button class="write-btn" onclick="startReview()">여기서 일한 적 있어요? 📣</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 4: FAB → 사업장 입력               -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-fab-input" class="screen">
+  <div class="form-header">
+    <button class="form-back" onclick="goTo('screen-main')">←</button>
+    <span class="form-title">어디서 일하셨어요?</span>
+  </div>
+  <div class="form-body">
+    <p style="font-size:13px;color:var(--text-sub);margin-bottom:20px;">사업장 정보를 입력해주세요</p>
+
+    <div class="form-section">
+      <div class="form-label">사업장 이름</div>
+      <input class="text-input" type="text" id="fab-biz-name" placeholder="예) 메가커피 정릉시장점">
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">동네</div>
+      <div class="option-chips" id="fab-region-chips">
+        <div class="option-chip" data-val="정릉" onclick="selectSingle(this,'fab-region-chips')">정릉</div>
+        <div class="option-chip" data-val="길음" onclick="selectSingle(this,'fab-region-chips')">길음</div>
+        <div class="option-chip" data-val="미아" onclick="selectSingle(this,'fab-region-chips')">미아</div>
+        <div class="option-chip" data-val="그 외" onclick="selectSingle(this,'fab-region-chips')">그 외</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">업종</div>
+      <div class="option-chips" id="fab-cat-chips">
+        <div class="option-chip" data-val="카페·베이커리" onclick="selectSingle(this,'fab-cat-chips')">카페·베이커리</div>
+        <div class="option-chip" data-val="편의점" onclick="selectSingle(this,'fab-cat-chips')">편의점</div>
+        <div class="option-chip" data-val="식당" onclick="selectSingle(this,'fab-cat-chips')">식당</div>
+        <div class="option-chip" data-val="PC방" onclick="selectSingle(this,'fab-cat-chips')">PC방</div>
+        <div class="option-chip" data-val="학원" onclick="selectSingle(this,'fab-cat-chips')">학원</div>
+        <div class="option-chip" data-val="기타" onclick="selectSingle(this,'fab-cat-chips')">기타</div>
+      </div>
+    </div>
+
+    <button class="big-btn" onclick="goToReview1FromFab()">다음 →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 5: 후기 작성 1단계 (팩트)          -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-review1" class="screen">
+  <div class="form-header">
+    <button class="form-back" id="review1-back" onclick="goBack1()">←</button>
+    <span class="form-title">근무 정보 확인</span>
+    <div class="progress-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+  <div class="form-body">
+
+    <div class="form-section">
+      <div class="form-label">언제 일하셨어요?</div>
+      <div id="period-preview" style="
+        display:none;
+        background:var(--yellow);
+        color:var(--navy);
+        font-size:13px;
+        font-weight:700;
+        padding:8px 14px;
+        border-radius:100px;
+        margin-bottom:12px;
+        width:fit-content;
+      "></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text-sub);margin-bottom:5px;font-weight:500;">시작</div>
+          <div style="display:flex;gap:6px;">
+            <select id="period-start-year" class="period-select" onchange="updatePeriod()">
+              <option value="">년도</option>
+            </select>
+            <select id="period-start-month" class="period-select" onchange="updatePeriod()">
+              <option value="">월</option>
+            </select>
+          </div>
+        </div>
+        <div style="color:var(--text-sub);font-size:18px;padding-top:18px;">~</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text-sub);margin-bottom:5px;font-weight:500;">종료</div>
+          <div style="display:flex;gap:6px;">
+            <select id="period-end-year" class="period-select" onchange="updatePeriod()">
+              <option value="">년도</option>
+            </select>
+            <select id="period-end-month" class="period-select" onchange="updatePeriod()">
+              <option value="">월</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-sub);cursor:pointer;">
+          <input type="checkbox" id="period-current" onchange="updatePeriod()" style="accent-color:var(--navy);width:15px;height:15px;">
+          현재도 일하는 중이에요
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">주휴수당 받았나요?</div>
+      <div class="option-chips" id="r1-pay">
+        <div class="option-chip" data-val="받았어요" onclick="selectSingle(this,'r1-pay')">받았어요</div>
+        <div class="option-chip" data-val="못 받았어요" onclick="selectSingle(this,'r1-pay')">못 받았어요</div>
+        <div class="option-chip" data-val="해당없음" onclick="selectSingle(this,'r1-pay')">해당없음</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">계약서 작성했나요?</div>
+      <div class="option-chips" id="r1-contract">
+        <div class="option-chip" data-val="작성 및 사본 완료" onclick="selectSingle(this,'r1-contract')">작성 및 사본 완료</div>
+        <div class="option-chip" data-val="작성만 함" onclick="selectSingle(this,'r1-contract')">작성만 함</div>
+        <div class="option-chip" data-val="작성 안 함" onclick="selectSingle(this,'r1-contract')">작성 안 함</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">사장님 성격<span class="form-sub">&nbsp;(여러 개 선택 가능)</span></div>
+      <div class="option-chips" id="r1-boss">
+        <div class="option-chip" data-val="말 안 거는 편" onclick="selectMulti(this)">말 안 거는 편</div>
+        <div class="option-chip" data-val="자주 말 걸어 옴" onclick="selectMulti(this)">자주 말 걸어 옴</div>
+        <div class="option-chip" data-val="감정기복 있음" onclick="selectMulti(this)">감정기복 있음</div>
+        <div class="option-chip" data-val="눈치 줌" onclick="selectMulti(this)">눈치 줌</div>
+        <div class="option-chip" data-val="반말함" onclick="selectMulti(this)">반말함</div>
+        <div class="option-chip" data-val="무관심한 편" onclick="selectMulti(this)">무관심한 편</div>
+        <div class="option-chip" data-val="말이 자주 바뀜" onclick="selectMulti(this)">말이 자주 바뀜</div>
+        <div class="option-chip" data-val="존댓말" onclick="selectMulti(this)">존댓말</div>
+        <div class="option-chip" data-val="사생활 질문 많음" onclick="selectMulti(this)">사생활 질문 많음</div>
+        <div class="option-chip" data-val="친절한 편" onclick="selectMulti(this)">친절한 편</div>
+        <div class="option-chip" data-val="꼼꼼" onclick="selectMulti(this)">꼼꼼</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">동료 구성/근무 환경<span class="form-sub">&nbsp;(여러 개 선택 가능)</span></div>
+      <div class="option-chips" id="r1-env">
+        <div class="option-chip" data-val="여성 多" onclick="selectMulti(this)">여성 多</div>
+        <div class="option-chip" data-val="남성 多" onclick="selectMulti(this)">남성 多</div>
+        <div class="option-chip" data-val="보통 혼자" onclick="selectMulti(this)">보통 혼자</div>
+        <div class="option-chip" data-val="바쁨" onclick="selectMulti(this)">바쁨</div>
+        <div class="option-chip" data-val="친절하게 알려줌" onclick="selectMulti(this)">친절하게 알려줌</div>
+        <div class="option-chip" data-val="소통 잘 됨" onclick="selectMulti(this)">소통 잘 됨</div>
+        <div class="option-chip" data-val="칼퇴 가능" onclick="selectMulti(this)">칼퇴 가능</div>
+        <div class="option-chip" data-val="쉬는 시간 없음" onclick="selectMulti(this)">쉬는 시간 없음</div>
+        <div class="option-chip" data-val="텃세" onclick="selectMulti(this)">텃세</div>
+        <div class="option-chip" data-val="초과근무 잦음" onclick="selectMulti(this)">초과근무 잦음</div>
+        <div class="option-chip" data-val="교육 없이 바로 투입" onclick="selectMulti(this)">교육 없이 바로 투입</div>
+        <div class="option-chip" data-val="마감 혼자 해야 함" onclick="selectMulti(this)">마감 혼자 해야 함</div>
+        <div class="option-chip" data-val="업무 매뉴얼 없음" onclick="selectMulti(this)">업무 매뉴얼 없음</div>
+      </div>
+    </div>
+
+    <button class="big-btn" onclick="goTo('screen-review2')">다음 →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 6: 후기 작성 2단계 (솔직 후기)     -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-review2" class="screen">
+  <div class="form-header">
+    <button class="form-back" onclick="goTo('screen-review1')">←</button>
+    <span class="form-title">솔직 후기</span>
+    <div class="progress-dots">
+      <div class="dot active"></div>
+      <div class="dot active"></div>
+    </div>
+  </div>
+  <div class="form-body">
+
+    <div class="form-section">
+      <div class="form-label">이 알바를 별점으로 매긴다면?</div>
+      <div class="star-row" id="star-row">
+        <button class="star-btn" data-val="1" onclick="setStar(1)">☆</button>
+        <button class="star-btn" data-val="2" onclick="setStar(2)">☆</button>
+        <button class="star-btn" data-val="3" onclick="setStar(3)">☆</button>
+        <button class="star-btn" data-val="4" onclick="setStar(4)">☆</button>
+        <button class="star-btn" data-val="5" onclick="setStar(5)">☆</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">이유가 궁금해요!</div>
+      <textarea class="textarea" id="r2-reason" placeholder="예) 연장 근무가 너무 잦아요"></textarea>
+    </div>
+
+    <div class="form-section">
+      <div class="form-label">다음 알바생에게 해주고 싶은 한마디는?</div>
+      <textarea class="textarea" id="r2-next" placeholder="예) 친절해요, 가끔 욱해요"></textarea>
+    </div>
+
+    <button class="big-btn" onclick="submitReview()">후기 등록하기 →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ 후기가 등록됐어요!</div>
+
+<!-- window 브릿지: module 함수들을 HTML onclick에서 호출 가능하게 -->
+<script>
+  function selectTab(el) { window._selectTab && window._selectTab(el); }
+  function selectCat(el) { window._selectCat && window._selectCat(el); }
+  function filterCards() { window._filterCards && window._filterCards(); }
+  function goTo(id) { window._goTo && window._goTo(id); }
+  function goBack1() { window._goBack1 && window._goBack1(); }
+  function openDetail(id) { window._openDetail && window._openDetail(id); }
+  function toggleTags(a,b) { window._toggleTags && window._toggleTags(a,b); }
+  function startReview() { window._startReview && window._startReview(); }
+  function deleteReview(a,b,c) { window._deleteReview && window._deleteReview(a,b,c); }
+  function editReview(a,b,c) { window._editReview && window._editReview(a,b,c); }
+  function selectSingle(el,g) { window._selectSingle && window._selectSingle(el,g); }
+  function selectMulti(el) { window._selectMulti && window._selectMulti(el); }
+  function goToReview1FromFab() { window._goToReview1FromFab && window._goToReview1FromFab(); }
+  function setStar(n) { window._setStar && window._setStar(n); }
+  function submitReview() { window._submitReview && window._submitReview(); }
+  function updatePeriod() { window._updatePeriod && window._updatePeriod(); }
+</script>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, getDoc, query, where, orderBy, serverTimestamp, setDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ─── FIREBASE INIT ───────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAkYqUTE99GH_wKnbZDbdrxDrXyBC-un6s",
+  authDomain: "seongbuk-zip.firebaseapp.com",
+  projectId: "seongbuk-zip",
+  storageBucket: "seongbuk-zip.firebasestorage.app",
+  messagingSenderId: "569975698031",
+  appId: "1:569975698031:web:5964e4a2280d41de0d539a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ─── STATE ──────────────────────────────────────────────
+let currentUser = null;
+let currentRegion = '전체';
+let currentCat = '전체';
+let currentBizId = null;
+let currentBizDocId = null;
+let reviewSource = 'detail';
+let fabBizData = {};
+let starValue = 0;
+let expandedReviews = {};
+let allBusinesses = [];
+
+// ─── AUTH ────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+  } else {
+    signInAnonymously(auth).catch(console.error);
+  }
+});
+
+// ─── SEED DATA (최초 1회만 실행) ─────────────────────────
+const seedData = [
+  {
+    name: '메가커피 정릉시장점', region: '정릉', category: '카페·베이커리', rating: 5,
+    tags: ['주휴수당✓', '친절한편', '자주 말 걸어 옴']
+  },
+  {
+    name: '파리바게트 정릉 국민대점', region: '정릉', category: '카페·베이커리', rating: 2,
+    tags: ['반말함', '무상근무 있음']
+  },
+  {
+    name: '스시로 미아점', region: '길음', category: '식당', rating: 2,
+    tags: ['말이 자주 바뀜', '텃세']
+  },
+  {
+    name: '컴포즈커피 미아점', region: '미아', category: '카페·베이커리', rating: 4,
+    tags: ['친절한편', '소통 잘 됨']
+  },
+  {
+    name: '맘스터치 고대타이거프라자점', region: '그 외', category: '식당', rating: 5,
+    tags: ['친절한편', '공짜식사']
+  },
+  {
+    name: '써브웨이 대학로점', region: '그 외', category: '식당', rating: 2,
+    tags: ['주휴수당✓', '사람자주나감']
+  }
+];
+
+const seedReviews = [
+  { bizName: '메가커피 정릉시장점', period: '@2025.08~2026.02', quote: '사장님이 친절하고 알바생들이 텃세 없어서 좋았습니다. 대타나와도 주휴를 주셨습니다', tags: ['주휴수당✓', '친절한편', '자주 말 걸어 옴', '여성 多', '친절하게 알려줌', '소통 잘 됨', '칼퇴 가능'], next: '최대한 오래해라', rating: 5 },
+  { bizName: '파리바게트 정릉 국민대점', period: '@2024.11~2025.03', quote: '파바 경력자 아니면 절대 추천 안합니다', tags: ['반말함', '무상근무 있음', '교육 없이 바로 투입', '쉬는 시간 없음'], next: '제발 도망가세요', rating: 2 },
+  { bizName: '스시로 미아점', period: '@2025.03~2025.07', quote: '안합니다', tags: ['말이 자주 바뀜', '텃세', '초과근무 잦음', '업무 매뉴얼 없음'], next: '오지마소', rating: 2 },
+  { bizName: '컴포즈커피 미아점', period: '@2025.06~2025.12', quote: '바쁘지만 카페 경험 쌓기 좋아요', tags: ['친절한편', '소통 잘 됨', '바쁨', '칼퇴 가능', '여성 多'], next: '매장 특성상 바쁘지만 꽤 재밌고 할만합니다', rating: 4 },
+  { bizName: '맘스터치 고대타이거프라자점', period: '@2025.09~2026.02', quote: '공짜 버거 개꿀 🍔', tags: ['친절한편', '소통 잘 됨', '친절하게 알려줌', '칼퇴 가능'], next: '기억력 좀 키워서 오기', rating: 5 },
+  { bizName: '써브웨이 대학로점', period: '@2025.04~2025.08', quote: '와봐야 앎. 엄청 바빠서 비추', tags: ['주휴수당✓', '바쁨', '초과근무 잦음', '쉬는 시간 없음'], next: '메뉴얼 숙지랑 단체카톡 공지 확인 중요', rating: 2 }
+];
+
+async function seedIfEmpty() {
+  const snap = await getDocs(collection(db, 'businesses'));
+  if (!snap.empty) return;
+  for (const biz of seedData) {
+    const bizRef = await addDoc(collection(db, 'businesses'), { ...biz, createdAt: serverTimestamp() });
+    const rev = seedReviews.find(r => r.bizName === biz.name);
+    if (rev) {
+      await addDoc(collection(db, 'reviews'), {
+        bizId: bizRef.id, bizName: biz.name,
+        period: rev.period, quote: rev.quote,
+        tags: rev.tags, next: rev.next,
+        rating: rev.rating, uid: 'seed',
+        createdAt: serverTimestamp()
+      });
+    }
+  }
+}
+
+// ─── LOAD DATA ───────────────────────────────────────────
+async function loadBusinesses() {
+  const snap = await getDocs(collection(db, 'businesses'));
+  allBusinesses = snap.docs.map(d => ({ docId: d.id, ...d.data(), reviews: [] }));
+
+  const revSnap = await getDocs(query(collection(db, 'reviews'), orderBy('createdAt', 'asc')));
+  revSnap.docs.forEach(d => {
+    const rev = { docId: d.id, ...d.data() };
+    const biz = allBusinesses.find(b => b.docId === rev.bizId);
+    if (biz) biz.reviews.push(rev);
+  });
+
+  filterCards();
+}
+
+// ─── FAB SCROLL ──────────────────────────────────────────
+document.getElementById('screen-main').addEventListener('scroll', function() {
+  const fab = document.getElementById('main-fab');
+  fab.classList.toggle('collapsed', this.scrollTop > 60);
+}, { passive: true });
+
+// ─── NAVIGATION ──────────────────────────────────────────
+window._goTo = function(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).scrollTop = 0;
+}
+
+window._goBack1 = function() {
+  goTo(reviewSource === 'fab' ? 'screen-fab-input' : 'screen-detail');
+}
+
+// ─── TABS & FILTERS ──────────────────────────────────────
+window._selectTab = function(el) {
+  document.querySelectorAll('#main-tabs .tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentRegion = el.dataset.region;
+  filterCards();
+}
+
+window._selectCat = function(el) {
+  document.querySelectorAll('#category-chips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentCat = el.dataset.cat;
+  filterCards();
+}
+
+function filterCards() {
+  const query2 = document.getElementById('search-input').value.trim().toLowerCase();
+  const filtered = allBusinesses.filter(b => {
+    const regionMatch = currentRegion === '전체' || b.region === currentRegion;
+    const catMatch = currentCat === '전체' || b.category === currentCat;
+    const searchMatch = !query2 || b.name.toLowerCase().includes(query2);
+    return regionMatch && catMatch && searchMatch;
+  });
+
+  const list = document.getElementById('card-list');
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'flex';
+  } else {
+    empty.style.display = 'none';
+    list.innerHTML = filtered.map(b => renderCard(b)).join('');
+  }
+}
+window._filterCards = filterCards;
+
+// ─── TAG HELPERS ─────────────────────────────────────────
+const POSITIVE_TAGS = new Set([
+  '주휴수당✓','친절한편','친절한 편','소통잘됨','소통 잘 됨','친절하게 알려줌',
+  '칼퇴 가능','공짜식사','꼼꼼','존댓말','말 안 거는 편','무관심한 편'
+]);
+function isPositive(t) { return POSITIVE_TAGS.has(t); }
+function sortTags(tags) {
+  const pay = tags.filter(t => t.includes('주휴수당✓'));
+  const pos = tags.filter(t => !t.includes('주휴수당✓') && isPositive(t));
+  const rest = tags.filter(t => !t.includes('주휴수당✓') && !isPositive(t));
+  return [...pay, ...pos, ...rest];
+}
+function tagClass(t) {
+  return (t.includes('주휴수당✓') || isPositive(t)) ? 'pay-yes' : '';
+}
+
+// ─── RENDER CARD ─────────────────────────────────────────
+function renderCard(b) {
+  const sorted = sortTags(b.tags || []);
+  const topTags = sorted.slice(0, 2).map(t =>
+    `<span class="tag-chip ${tagClass(t)}">${t}</span>`
+  ).join('');
+  const quote = b.reviews[0] ? b.reviews[0].quote : '';
+  const avgRating = b.reviews.length
+    ? Math.round(b.reviews.reduce((s, r) => s + (r.rating || 0), 0) / b.reviews.length)
+    : b.rating || 0;
+  return `
+    <div class="biz-card" onclick="openDetail('${b.docId}')">
+      <div class="biz-top">
+        <div>
+          <div class="biz-name">${b.name}</div>
+          <div class="biz-meta">${b.category}·후기 ${b.reviews.length}개 ⭐ ${avgRating}</div>
+        </div>
+      </div>
+      <div class="biz-tags">${topTags}</div>
+      <div class="biz-quote">${quote}</div>
+    </div>
+  `;
+}
+
+// ─── DETAIL ──────────────────────────────────────────────
+window._openDetail = function(docId) {
+  const b = allBusinesses.find(x => x.docId === docId);
+  currentBizId = docId;
+  currentBizDocId = docId;
+  reviewSource = 'detail';
+
+  document.getElementById('detail-region').textContent = b.region;
+  document.getElementById('detail-name').textContent = b.name;
+  document.getElementById('detail-category').textContent = b.category;
+  document.getElementById('detail-review-count').textContent = `후기 ${b.reviews.length}개`;
+
+  const sorted = sortTags(b.tags || []);
+  document.getElementById('detail-all-tags').innerHTML = sorted.map(t =>
+    `<span class="tag-chip ${tagClass(t)}">${t}</span>`
+  ).join('');
+
+  document.getElementById('detail-reviews').innerHTML = b.reviews.map((r, i) =>
+    renderReview(docId, i, r)
+  ).join('');
+
+  goTo('screen-detail');
+}
+
+function renderReview(bizDocId, idx, r) {
+  const key = `${bizDocId}_${idx}`;
+  const expanded = expandedReviews[key];
+  const sorted = sortTags(r.tags || []);
+  const visible = expanded ? sorted : sorted.slice(0, 4);
+  const tagHtml = visible.map(t =>
+    `<span class="review-tag ${tagClass(t)}">${t}</span>`
+  ).join('');
+  const toggleHtml = sorted.length > 4
+    ? `<button class="review-tag-toggle" onclick="toggleTags('${bizDocId}',${idx})">${expanded ? '태그 접기 ∧' : '태그 더보기 ∨'}</button>`
+    : '';
+  const avatarSvg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+    <circle cx="20" cy="20" r="20" fill="#0D1B2A"/>
+    <circle cx="20" cy="15" r="6" fill="#F5FF4F"/>
+    <path d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#F5FF4F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  </svg>`;
+
+  // 수정/삭제 버튼 - 본인 후기만
+  const isOwner = currentUser && r.uid === currentUser.uid;
+  const actionBtns = isOwner ? `
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="review-action-btn" onclick="editReview('${bizDocId}',${idx},'${r.docId}')">수정</button>
+      <button class="review-action-btn danger" onclick="deleteReview('${bizDocId}',${idx},'${r.docId}')">삭제</button>
+    </div>` : '';
+
+  return `
+    <div class="review-card" id="review-card-${key}">
+      <div class="review-top">
+        <div class="avatar">${avatarSvg}</div>
+        <div class="review-period">${r.period}</div>
+      </div>
+      <div class="review-quote">${r.quote}</div>
+      <div class="review-tags">${tagHtml}</div>
+      ${toggleHtml}
+      <div class="next-message">
+        <div class="next-message-label">📣 다음 알바생에게</div>
+        <div class="next-message-text">${r.next}</div>
+      </div>
+      ${actionBtns}
+    </div>
+  `;
+}
+
+window._toggleTags = function(bizDocId, idx) {
+  const key = `${bizDocId}_${idx}`;
+  expandedReviews[key] = !expandedReviews[key];
+  const b = allBusinesses.find(x => x.docId === bizDocId);
+  const card = document.getElementById(`review-card-${key}`);
+  if (card) card.outerHTML = renderReview(bizDocId, idx, b.reviews[idx]);
+}
+
+window._startReview = function() {
+  reviewSource = 'detail';
+  goTo('screen-review1');
+}
+
+// ─── DELETE REVIEW ───────────────────────────────────────
+window._deleteReview = async function(bizDocId, idx, reviewDocId) {
+  if (!confirm('후기를 삭제할까요?')) return;
+  try {
+    await deleteDoc(doc(db, 'reviews', reviewDocId));
+    const b = allBusinesses.find(x => x.docId === bizDocId);
+    b.reviews.splice(idx, 1);
+    // 별점 재계산
+    if (b.reviews.length > 0) {
+      const avg = Math.round(b.reviews.reduce((s, r) => s + (r.rating || 0), 0) / b.reviews.length);
+      await updateDoc(doc(db, 'businesses', bizDocId), { rating: avg });
+      b.rating = avg;
+    }
+    document.getElementById('detail-reviews').innerHTML = b.reviews.map((r, i) =>
+      renderReview(bizDocId, i, r)
+    ).join('');
+    document.getElementById('detail-review-count').textContent = `후기 ${b.reviews.length}개`;
+    filterCards();
+    showToast('후기가 삭제됐어요');
+  } catch(e) { alert('삭제 실패: ' + e.message); }
+}
+
+// ─── EDIT REVIEW ─────────────────────────────────────────
+let editingReviewDocId = null;
+window._editReview = function(bizDocId, idx, reviewDocId) {
+  const b = allBusinesses.find(x => x.docId === bizDocId);
+  const r = b.reviews[idx];
+  editingReviewDocId = reviewDocId;
+  currentBizId = bizDocId;
+  reviewSource = 'detail';
+
+  // 폼에 기존 데이터 채우기
+  document.getElementById('r2-reason').value = r.quote;
+  document.getElementById('r2-next').value = r.next;
+  setStar(r.rating || 0);
+
+  // 기간 파싱 @YYYY.MM~YYYY.MM
+  const periodText = r.period || '';
+  document.getElementById('period-preview').style.display = 'block';
+  document.getElementById('period-preview').textContent = periodText;
+
+  goTo('screen-review1');
+}
+
+// ─── FAB INPUT ───────────────────────────────────────────
+window._selectSingle = function(el, groupId) {
+  document.querySelectorAll(`#${groupId} .option-chip`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+window._selectMulti = function(el) { el.classList.toggle('selected'); }
+
+window._goToReview1FromFab = function() {
+  const name = document.getElementById('fab-biz-name').value.trim();
+  const region = document.querySelector('#fab-region-chips .option-chip.selected')?.dataset.val;
+  const cat = document.querySelector('#fab-cat-chips .option-chip.selected')?.dataset.val;
+  if (!name) { alert('사업장 이름을 입력해주세요'); return; }
+  if (!region) { alert('동네를 선택해주세요'); return; }
+  if (!cat) { alert('업종을 선택해주세요'); return; }
+  fabBizData = { name, region, category: cat };
+  reviewSource = 'fab';
+  editingReviewDocId = null;
+  goTo('screen-review1');
+}
+
+// ─── STAR ────────────────────────────────────────────────
+window._setStar = function(n) {
+  starValue = n;
+  document.querySelectorAll('#star-row .star-btn').forEach((btn, i) => {
+    btn.textContent = i < n ? '★' : '☆';
+    btn.classList.toggle('lit', i < n);
+  });
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────
+window._submitReview = async function() {
+  if (!currentUser) { alert('잠시 후 다시 시도해주세요'); return; }
+  const reason = document.getElementById('r2-reason').value.trim();
+  const next = document.getElementById('r2-next').value.trim();
+  if (!starValue) { alert('별점을 선택해주세요'); return; }
+
+  const periodPreview = document.getElementById('period-preview');
+  const period = (periodPreview.style.display !== 'none' && periodPreview.textContent)
+    ? periodPreview.textContent
+    : `@${new Date().getFullYear()}.${String(new Date().getMonth()+1).padStart(2,'0')}`;
+
+  const selectedTags = [...document.querySelectorAll(
+    '#r1-pay .option-chip.selected, #r1-contract .option-chip.selected, #r1-boss .option-chip.selected, #r1-env .option-chip.selected'
+  )].map(c => c.dataset.val);
+
+  try {
+    if (editingReviewDocId) {
+      // ── 수정 ──
+      await updateDoc(doc(db, 'reviews', editingReviewDocId), {
+        quote: reason || '후기 없음',
+        next: next || '...',
+        rating: starValue,
+        period,
+        tags: selectedTags
+      });
+      const b = allBusinesses.find(x => x.docId === currentBizId);
+      const rev = b.reviews.find(r => r.docId === editingReviewDocId);
+      if (rev) {
+        rev.quote = reason || '후기 없음';
+        rev.next = next || '...';
+        rev.rating = starValue;
+        rev.period = period;
+        rev.tags = selectedTags;
+      }
+      const avg = Math.round(b.reviews.reduce((s,r)=>s+(r.rating||0),0)/b.reviews.length);
+      await updateDoc(doc(db,'businesses',currentBizId),{rating:avg});
+      b.rating = avg;
+      editingReviewDocId = null;
+      showToast('후기가 수정됐어요!');
+    } else {
+      // ── 신규 등록 ──
+      let bizDocId = currentBizId;
+
+      if (reviewSource === 'fab') {
+        // 같은 사업장 있는지 확인
+        let existing = allBusinesses.find(b =>
+          b.name === fabBizData.name && b.region === fabBizData.region
+        );
+        if (!existing) {
+          const bizRef = await addDoc(collection(db, 'businesses'), {
+            name: fabBizData.name,
+            region: fabBizData.region,
+            category: fabBizData.category,
+            rating: starValue,
+            tags: selectedTags.slice(0, 3),
+            createdAt: serverTimestamp()
+          });
+          existing = { docId: bizRef.id, name: fabBizData.name, region: fabBizData.region, category: fabBizData.category, rating: starValue, tags: selectedTags.slice(0,3), reviews: [] };
+          allBusinesses.push(existing);
+        }
+        bizDocId = existing.docId;
+        currentBizId = bizDocId;
+      }
+
+      const revRef = await addDoc(collection(db, 'reviews'), {
+        bizId: bizDocId,
+        bizName: allBusinesses.find(b=>b.docId===bizDocId)?.name || fabBizData.name,
+        period, quote: reason || '후기 없음',
+        tags: selectedTags, next: next || '...',
+        rating: starValue, uid: currentUser.uid,
+        createdAt: serverTimestamp()
+      });
+
+      const b = allBusinesses.find(x => x.docId === bizDocId);
+      b.reviews.push({ docId: revRef.id, period, quote: reason||'후기 없음', tags: selectedTags, next: next||'...', rating: starValue, uid: currentUser.uid });
+      const avg = Math.round(b.reviews.reduce((s,r)=>s+(r.rating||0),0)/b.reviews.length);
+      await updateDoc(doc(db,'businesses',bizDocId),{
+        rating: avg,
+        tags: [...new Set([...b.tags, ...selectedTags.slice(0,2)])].slice(0,5)
+      });
+      b.rating = avg;
+      showToast('후기가 등록됐어요!');
+    }
+
+    // 폼 리셋
+    setStar(0);
+    document.getElementById('r2-reason').value = '';
+    document.getElementById('r2-next').value = '';
+    document.querySelectorAll('.option-chip.selected').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('fab-biz-name').value = '';
+    document.getElementById('period-start-year').value = '';
+    document.getElementById('period-start-month').value = '';
+    document.getElementById('period-end-year').value = '';
+    document.getElementById('period-end-month').value = '';
+    document.getElementById('period-current').checked = false;
+    document.getElementById('period-preview').style.display = 'none';
+
+    filterCards();
+    goTo('screen-main');
+  } catch(e) { alert('저장 실패: ' + e.message); }
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✅ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── PERIOD ──────────────────────────────────────────────
+window._updatePeriod = function() {
+  const sy = document.getElementById('period-start-year').value;
+  const sm = document.getElementById('period-start-month').value;
+  const ey = document.getElementById('period-end-year').value;
+  const em = document.getElementById('period-end-month').value;
+  const current = document.getElementById('period-current').checked;
+  const preview = document.getElementById('period-preview');
+  document.getElementById('period-end-year').disabled = current;
+  document.getElementById('period-end-month').disabled = current;
+  if (sy && sm) {
+    const end = current ? '현재' : (ey && em ? `${ey}.${em}` : '');
+    if (end) {
+      preview.style.display = 'block';
+      preview.textContent = `@${sy}.${sm}~${end}`;
+    } else { preview.style.display = 'none'; }
+  } else { preview.style.display = 'none'; }
+}
+
+// ─── INIT ────────────────────────────────────────────────
+(function initPeriodSelects() {
+  const curYear = new Date().getFullYear();
+  ['period-start-year','period-end-year'].forEach(id => {
+    const sel = document.getElementById(id);
+    for (let y = curYear; y >= curYear - 6; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y + '년';
+      sel.appendChild(opt);
+    }
+  });
+  ['period-start-month','period-end-month'].forEach(id => {
+    const sel = document.getElementById(id);
+    for (let m = 1; m <= 12; m++) {
+      const opt = document.createElement('option');
+      opt.value = String(m).padStart(2,'0');
+      opt.textContent = m + '월';
+      sel.appendChild(opt);
+    }
+  });
+})();
+
+await seedIfEmpty();
+await loadBusinesses();
+
+</script>
+<!--  구버전 더미 JS 제거됨 -->
+</script>
+
+<!-- review-action-btn CSS -->
+<style>
+  .review-action-btn {
+    background: none;
+    border: 1.5px solid var(--chip-border);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+  .review-action-btn.danger {
+    border-color: #ffcccc;
+    color: #cc0000;
+  }
+</style>
+</body>
+</html>
